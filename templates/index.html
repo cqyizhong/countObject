@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <title>Python 统计（恒星/细胞）数量</title>
+    <style>
+    .button {
+        background-color: #4CAF50;
+        border: none;
+        color: white;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+    }
+
+    </style>
+</head>
+<body>
+    <h1>Python 统计（恒星/细胞）数量</h1>
+    <p>1.点击"选择文件" -> 2.点击"统计" ->3.等待查看结果</p>
+
+    <img id="base64image" src="" style="max-height:150px;"/>
+    <br />
+    <input type="file" class="button" name="image" accept="image/gif,image/jpeg,image/jpg,image/png,image/svg"/>
+    <br />
+    <input type="button" class="button" value="统计"/>
+    <input type="text" style="height:25px; font-size:22px; font-weight:bold;color:red" size = "30"  id="count" value="（恒星/细胞）的统计数量："/>
+    <p id="res"></p>
+
+    <script>
+    var base64image = document.querySelector('#base64image');
+    var fileElement = document.querySelector('input[type="file"]');
+    var btnElement = document.querySelector('input[type="button"]');
+    var textCount = document.querySelector('#count');
+
+    //预览
+    fileElement.addEventListener('change', function(event){
+        if (!event.target.files || !event.target.files[0]) {
+            return;
+        }
+        var reader = new FileReader();
+        reader.readAsDataURL(event.target.files[0]);
+
+        reader.addEventListener("load", function(e){
+            base64image.src = e.target.result; //base64编码
+            textCount.value = "（恒星/细胞）的统计数量："
+        }, false);
+    },false);
+
+    //ajax
+    btnElement.addEventListener('click', function(event){
+        event.preventDefault();
+
+        var data = new FormData();
+        data.append(fileElement.name, fileElement.files[0]);  //添加图片信息
+
+        var xhr = new XMLHttpRequest();
+
+        xhr.open("post", "/uploadfile", true);//true即异步
+        xhr.send(data);
+        textCount.value = "正在统计（恒星/细胞）的数量，请稍等一下！"
+
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4){
+                if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304){
+                     textCount.value = "（恒星/细胞）的统计数量："+xhr.responseText;
+                } else {
+                     textCount.value = "（恒星/细胞）的统计数量："
+                }
+            }
+        }
+
+    },false);
+
+    </script>
+</body>
+</html>
